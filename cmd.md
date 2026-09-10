@@ -7,5 +7,5 @@ curl -sSL https://github.com/anu11234/Create-and-Manage-Bigtable-Instances-Chall
 ```
 
 ```bash
-
+curl -sSL https://github.com/anu11234/Create-and-Manage-Bigtable-Instances-Challenge-Lab/blob/main/lab_cleanup.sh | bash
 ```
