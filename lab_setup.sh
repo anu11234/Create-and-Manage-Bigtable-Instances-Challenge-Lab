@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 set -e
 
-# Dynamically retrieve Project ID and default variables
 export PROJECT_ID=$(gcloud config get-value project)
 export INSTANCE_ID="ecommerce-recommendations"
 export CLUSTER_1="ecommerce-recommendations-c1"
@@ -13,12 +12,8 @@ export ZONE_2="us-east4-c"
 echo "=== 1. Creating Bigtable Instance ==="
 gcloud bigtable instances create $INSTANCE_ID \
     --display-name=$INSTANCE_ID \
-    --cluster=$CLUSTER_1 \
-    --cluster-zone=$ZONE_1 \
-    --cluster-storage-type=SSD \
-    --cluster-autoscaling-min-nodes=1 \
-    --cluster-autoscaling-max-nodes=5 \
-    --cluster-autoscaling-cpu-target=60
+    --instance-type=PRODUCTION \
+    --cluster-config=id=$CLUSTER_1,zone=$ZONE_1,autoscaling-min-nodes=1,autoscaling-max-nodes=5,autoscaling-cpu-target=60
 
 echo "=== 2. Creating Tables ==="
 echo "project = $PROJECT_ID" > ~/.cbtrc
@@ -64,8 +59,6 @@ gcloud bigtable backups create PersonalizedProducts_7 \
     --table=PersonalizedProducts \
     --expiration-date=$(date -u -d "+7 days" +%Y-%m-%dT%H:%M:%SZ)
 
-gcloud dataflow jobs list --region=$REGION --status=active
-
 gcloud bigtable instances tables restore \
     --source-instance=$INSTANCE_ID \
     --source-cluster=$CLUSTER_1 \
@@ -73,4 +66,4 @@ gcloud bigtable instances tables restore \
     --destination-instance=$INSTANCE_ID \
     --destination-table=PersonalizedProducts_7_restored
 
-echo "=== Tasks 1–4 Completed! Verify your progress on the lab page before proceeding to deletion. ==="
+echo "=== Setup Complete! ==="
