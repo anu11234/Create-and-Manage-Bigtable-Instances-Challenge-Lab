@@ -17,7 +17,6 @@ export ZONE_2=$(gcloud compute zones list --filter="region:$REGION AND name:us-e
 echo "=== 1. Creating Bigtable Instance ($INSTANCE_ID) ==="
 gcloud bigtable instances create "$INSTANCE_ID" \
     --display-name="$INSTANCE_ID" \
-    --instance-type=PRODUCTION \
     --cluster-config=id="$CLUSTER_1",zone="$ZONE_1",autoscaling-min-nodes=1,autoscaling-max-nodes=5,autoscaling-cpu-target=60
 
 echo "=== 2. Creating CBT Tables ==="
@@ -32,7 +31,7 @@ gcloud services disable dataflow.googleapis.com --force
 gcloud services enable dataflow.googleapis.com
 
 gcloud dataflow jobs run import-sessions \
-    --gcs-location=gs://dataflow-templates/latest/SequenceFile_to_Bigtable \
+    --gcs-location=gs://dataflow-templates/latest/GCS_SequenceFile_to_Cloud_Bigtable \
     --region="$REGION" \
     --parameters \
 bigtableProject="$PROJECT_ID",\
@@ -41,7 +40,7 @@ bigtableTableId=SessionHistory,\
 inputFilePattern=gs://spls/gsp380/retail-engagements-sales-00000-of-00001
 
 gcloud dataflow jobs run import-recommendations \
-    --gcs-location=gs://dataflow-templates/latest/SequenceFile_to_Bigtable \
+    --gcs-location=gs://dataflow-templates/latest/GCS_SequenceFile_to_Cloud_Bigtable \
     --region="$REGION" \
     --parameters \
 bigtableProject="$PROJECT_ID",\
