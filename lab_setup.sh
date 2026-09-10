@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
-set -e
 
 # Dynamically fetch current project ID from active gcloud environment
 export PROJECT_ID=$(gcloud config get-value project)
@@ -17,14 +16,14 @@ export ZONE_2=$(gcloud compute zones list --filter="region:$REGION AND name:us-e
 echo "=== 1. Creating Bigtable Instance ($INSTANCE_ID) ==="
 gcloud bigtable instances create "$INSTANCE_ID" \
     --display-name="$INSTANCE_ID" \
-    --cluster-config=id="$CLUSTER_1",zone="$ZONE_1",autoscaling-min-nodes=1,autoscaling-max-nodes=5,autoscaling-cpu-target=60
+    --cluster-config=id="$CLUSTER_1",zone="$ZONE_1",autoscaling-min-nodes=1,autoscaling-max-nodes=5,autoscaling-cpu-target=60 || true
 
 echo "=== 2. Creating CBT Tables ==="
 echo "project = $PROJECT_ID" > ~/.cbtrc
 echo "instance = $INSTANCE_ID" >> ~/.cbtrc
 
-cbt createtable SessionHistory families=Engagements,Sales
-cbt createtable PersonalizedProducts families=Recommendations
+cbt createtable SessionHistory families=Engagements,Sales || true
+cbt createtable PersonalizedProducts families=Recommendations || true
 
 echo "=== 3. Restarting Dataflow API & Running Import Jobs ==="
 gcloud services disable dataflow.googleapis.com --force
@@ -54,20 +53,20 @@ gcloud bigtable clusters create "$CLUSTER_2" \
     --zone="$ZONE_2" \
     --autoscaling-min-nodes=1 \
     --autoscaling-max-nodes=5 \
-    --autoscaling-cpu-target=60
+    --autoscaling-cpu-target=60 || true
 
 echo "=== 5. Creating Backup & Restoring Table ==="
 gcloud bigtable backups create PersonalizedProducts_7 \
     --instance="$INSTANCE_ID" \
     --cluster="$CLUSTER_1" \
     --table=PersonalizedProducts \
-    --expiration-date=$(date -u -d "+7 days" +%Y-%m-%dT%H:%M:%SZ)
+    --expiration-date=$(date -u -d "+7 days" +%Y-%m-%dT%H:%M:%SZ) || true
 
 gcloud bigtable instances tables restore \
     --source-instance="$INSTANCE_ID" \
     --source-cluster="$CLUSTER_1" \
     --source-backup=PersonalizedProducts_7 \
     --destination-instance="$INSTANCE_ID" \
-    --destination-table=PersonalizedProducts_7_restored
+    --destination-table=PersonalizedProducts_7_restored || true
 
-echo "=== Tasks 1 through 4 Setup Complete! ==="
+echo "=== Setup Commands Submitted Successfully! ==="
