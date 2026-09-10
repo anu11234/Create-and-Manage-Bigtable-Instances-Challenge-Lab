@@ -3,4 +3,9 @@
 **Command:**
 
 ```bash
-curl -sSL https://raw.githubusercontent.com/YOUR_GITHUB_USERNAME/YOUR_REPO/main/lab_setup.sh | bash
+curl -sSL https://github.com/anu11234/Create-and-Manage-Bigtable-Instances-Challenge-Lab/blob/main/lab_setup.sh | bash
+```
+
+```bash
+
+```
